@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>Alert History</h2>
+  <p class="hint">
+    Last 200 alerts. You can also
+    <a href="{{ url_for('alerts_history_csv') }}">download CSV</a>.
+  </p>
+  <table class="simple">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Started</th>
+        <th>Resolved</th>
+        <th>Mode</th>
+        <th>Action</th>
+        <th>Zone</th>
+        <th>Total ACKs</th>
+        <th>Resolved By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in alerts %}
+      <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.started_at|datetimeformat }}</td>
+        <td>{% if a.resolved_at %}{{ a.resolved_at|datetimeformat }}{% else %}&mdash;{% endif %}</td>
+        <td>{{ a.mode }}</td>
+        <td>{{ a.action }}</td>
+        <td>{{ a.zone or "ALL" }}</td>
+        <td>{{ a.total_acks or 0 }}</td>
+        <td>{{ a.resolved_by or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

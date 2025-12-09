@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card center">
+  <h2>Manual Trigger (Admin/Test)</h2>
+  <form method="POST">
+    <label>Action
+      <select name="action">
+        {% for a in actions %}<option value="{{ a }}">{{ a }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Mode
+      <select name="mode">
+        <option>DRILL</option>
+        <option>LIVE</option>
+      </select>
+    </label>
+    <button class="btn primary" type="submit">Send</button>
+  </form>
+</section>
+{% endblock %}

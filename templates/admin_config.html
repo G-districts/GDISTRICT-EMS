@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>System Configuration</h2>
+  <p class="hint">
+    These settings are saved to <code>config.yaml</code> on the server.
+    Be careful: incorrect values can break integrations.
+  </p>
+  <form method="POST" action="{{ url_for('admin_config_post') }}" class="form-grid">
+    <h3 style="grid-column: 1 / -1;">ClockWise</h3>
+    <label>
+      <input type="checkbox" name="clockwise_enabled" {% if clockwise.enabled %}checked{% endif %}>
+      Enable ClockWise UDP
+    </label>
+    <label>ClockWise IP
+      <input type="text" name="clockwise_ip" value="{{ clockwise.ip or '' }}">
+    </label>
+    <label>ClockWise Port
+      <input type="number" name="clockwise_port" value="{{ clockwise.port or 8090 }}">
+    </label>
+
+    <label>ClockWise Mode
+      <select name="clockwise_mode">
+        <option value="udp" {% if (clockwise.mode or 'udp') == 'udp' %}selected{% endif %}>UDP</option>
+        <option value="http" {% if (clockwise.mode or 'udp') == 'http' %}selected{% endif %}>HTTP</option>
+      </select>
+    </label>
+    <label>ClockWise HTTP URL template
+      <input type="text" name="clockwise_http_url" value="{{ clockwise.http_url or '' }}" placeholder="http://ip:port/path?channel={payload}">
+    </label>
+    
+    <label style="grid-column: 1 / -1;">ClockWise Triggers (YAML dict: ACTION -> payload)
+      <textarea name="clockwise_triggers" rows="6" style="width:100%;">{{ clockwise_triggers_yaml }}</textarea>
+    </label>
+
+    <h3 style="grid-column: 1 / -1; margin-top: 20px;">Zones (YAML)</h3>
+    <p class="hint" style="grid-column: 1 / -1;">
+      Define any zones you like. Example:
+      <pre>MAIN:
+  displays: ["display-1"]
+ANNEX:
+  displays: ["display-2"]</pre>
+    </p>
+    <label style="grid-column: 1 / -1;">Zones YAML
+      <textarea name="zones_yaml" rows="10" style="width:100%;">{{ zones_yaml }}</textarea>
+    </label>
+
+    <div style="grid-column: 1 / -1; margin-top: 10px;">
+      <button type="submit" class="btn lockdown">Save Configuration</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
