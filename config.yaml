@@ -1,0 +1,59 @@
+app:
+  secret_key: wqkx hycd emht qhdg
+  admin_passcode: letmein
+branding:
+  service_name: G School EMS
+  site_name: GHOME
+  from_display: G-District Alerts
+  fixed_recipients:
+  - responder_alerts@gdistrict.org
+  - admin@gdistrict.org
+gotify:
+  enabled: true
+  url: https://gschoolems.onrender.com/
+  token: Afp58Un9JW_HI6P
+  priority: 10
+email:
+  smtp_host: smtp.gmail.com
+  smtp_port: 587
+  username: admin@gdistrict.org
+  app_password: wqkx hycd emht qhdg
+  from_alias: alert@gdistrict.org
+  use_ssl: false
+  use_tls: true
+asterisk:
+  ami_host: 172.16.50.177
+  ami_port: 5038
+  ami_username: alertbot
+  ami_secret: supersecret
+  page_extension: '7900'
+  playback_file: custom/tone
+clockwise:
+  enabled: true
+  ip: 172.16.50.192
+  port: 8089
+  triggers:
+    HOLD: HOLD
+    SECURE: SECURE
+    SHELTER: SHLTR
+    EVACUATE: EVAC
+    LOCKDOWN: LOCKDOWN
+  mode: http
+  http_url: http://172.16.50.192:8089/trigger={payload}?password=SideDoor
+cisco:
+  enabled: true
+  phones:
+  - 172.16.50.194
+  - 172.16.50.171
+  - 172.16.50.161
+  username: admin
+  password: admin
+  tftp_audio: tone.raw
+ui:
+  icons_dir: static/icons
+  icons:
+    HOLD: hold.png
+    SECURE: secure.png
+    SHELTER: shelter.png
+    EVACUATE: evacuate.png
+    LOCKDOWN: lockdown.png

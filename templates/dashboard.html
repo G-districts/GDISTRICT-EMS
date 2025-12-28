@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <h2>Quick Alerts</h2>
+    <form method="POST" action="{{ url_for('trigger_action') }}">
+      <div class="mode-row">
+        <label class="radio"><input type="radio" name="mode" value="DRILL" checked> DRILL</label>
+        <label class="radio"><input type="radio" name="mode" value="LIVE"> LIVE</label>
+      </div>
+      <div class="grid2">
+        <label class="hint" style="margin-top:6px;display:block;">Zone / Building
+          <input type="text" name="zone" placeholder="ALL or custom zone name">
+        </label>
+        <label class="hint" style="margin-top:6px;display:block;">Severity (optional)
+          <select name="severity">
+            <option value="">Not set</option>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+            <option value="CRITICAL">CRITICAL</option>
+          </select>
+        </label>
+      </div>
+      <label class="hint" style="margin-top:6px;display:block;">Incident Details (optional)
+        <textarea name="details" rows="3" placeholder="Example: Suspected gas leak near science wing. Awaiting maintenance."></textarea>
+      </label>
+      <div class="buttons">
+        <button class="btn hold"    name="action" value="HOLD"    type="submit">HOLD</button>
+        <button class="btn secure"  name="action" value="SECURE"  type="submit">SECURE</button>
+        <button class="btn shelter" name="action" value="SHELTER" type="submit">SHELTER</button>
+        <button class="btn evacuate"name="action" value="EVACUATE"type="submit">EVACUATE</button>
+        <button class="btn lockdown"name="action" value="LOCKDOWN"type="submit">LOCKDOWN</button>
+      </div>
+    </form>
+    <div class="hint">Cisco phones fire first, then paging, then RSS bump, then email.</div>
+    <button class="btn panic" id="panicBtn">PANIC (Live Lockdown)</button>
+  </div>
+
+  <div class="card">
+    <h2>Attendance</h2>
+    <div class="roster">
+      {% for s in roster %}
+        <div class="student" data-name="{{ s }}">
+          <span>{{ s }}</span>
+          <div class="chiprow">
+            <button class="chip present" data-status="Present">Present</button>
+            <button class="chip missing"  data-status="Missing">Missing</button>
+            <button class="chip safe"     data-status="Safe">Safe</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="actions">
+      <button id="saveAttendance" class="btn primary">Save Attendance</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="card">
+  <h2>Acknowledgements</h2>
+  <p class="hint">Stations that have acknowledged the current alert.</p>
+  {% if ack_summary and ack_summary.mode != "IDLE" and ack_summary.count %}
+    <p><strong>{{ ack_summary.count }}</strong> station(s) acknowledged for <strong>{{ ack_summary.mode }} {{ ack_summary.action }}</strong>.</p>
+    <table class="simple">
+      <thead>
+        <tr><th>Station</th><th>Ack Time</th></tr>
+      </thead>
+      <tbody>
+        {% for row in ack_summary.acks %}
+          <tr>
+            <td>{{ row.station }}</td>
+            <td>{{ row.ack_ts | datetimeformat }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif ack_summary and ack_summary.mode != "IDLE" %}
+    <p>No acknowledgements yet for <strong>{{ ack_summary.mode }} {{ ack_summary.action }}</strong>.</p>
+  {% else %}
+    <p>No active alert.</p>
+  {% endif %}
+</section>
+
+<section class="card center wide">
+  <h2>Displays / LED Panels</h2>
+  <p class="hint">Devices poll <code>/api/display/&lt;id&gt;/text</code>. Use this form to push a one-time custom message.</p>
+  <form method="POST" action="{{ url_for('display_send') }}">
+    <div class="grid2">
+      <label>Display ID
+        <input name="display_id" value="display-1">
+      </label>
+      <label>Admin Passcode
+        <input name="passcode" type="password" placeholder="required">
+      </label>
+    </div>
+    <label>Message Text
+      <input name="message" placeholder="Custom message to show on this display">
+    </label>
+    <div class="actions">
+      <button class="btn primary" type="submit">Send Display Message</button>
+    </div>
+  </form>
+</section>
+
+
+
+<section class="card">
+  <h2>Current Alert</h2>
+  {% if last_alert and last_alert.mode != "IDLE" %}
+    <p class="hint">
+      Active: <strong>{{ last_alert.mode }} {{ last_alert.action }}</strong>
+      {% if last_alert.zone %}(Zone: {{ last_alert.zone }}){% endif %}
+    </p>
+    {% if last_alert.severity %}<p class="hint">Severity: <strong>{{ last_alert.severity }}</strong></p>{% endif %}
+    {% if last_alert.details %}<p class="hint">Details: {{ last_alert.details }}</p>{% endif %}
+    <form method="POST" action="{{ url_for('resolve_current_alert') }}">
+      <button type="submit" class="btn primary">
+        Resolve Current Alert
+      </button>
+    </form>
+  {% else %}
+    <p class="hint">System is currently IDLE.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Admin Tools</h2>
+  <p class="hint">
+    Additional tools for admins.
+  </p>
+  <ul>
+    <li><a href="{{ url_for('alerts_history') }}">View Alert History / Export CSV</a></li>
+    <li><a href="{{ url_for('admin_displays') }}">View Displays / Panel Status</a></li>
+    <li><a href="{{ url_for('admin_drills') }}">Manage Scheduled Drills</a></li>
+    <li><a href="{{ url_for('admin_config') }}">System Configuration (ClockWise, Zones)</a></li>
+  </ul>
+</section>
+
+
+{% endblock %}
